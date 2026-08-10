@@ -814,6 +814,54 @@ function defaultMonth(){
   return {income:inc,expenses:exp};
 }
 
+function defaultMonthWithExampleData(){
+  const inc = [
+    {id:uid(),label:'Salary',amount:3500,freq:'monthly'},
+    {id:uid(),label:'Freelance',amount:800,freq:'monthly'}
+  ];
+  const exp = {};
+  
+  // Example data with realistic amounts
+  const defaults = {
+    housing:[
+      {label:'Rent / Mortgage', amount:1200},
+      {label:'Utilities', amount:150}
+    ],
+    food:[
+      {label:'Groceries', amount:400},
+      {label:'Dining out', amount:200}
+    ],
+    transport:[
+      {label:'Fuel / Transit', amount:200},
+      {label:'Car payment', amount:300}
+    ],
+    health:[
+      {label:'Insurance', amount:180},
+      {label:'Medications', amount:50}
+    ],
+    education:[
+      {label:'Tuition / Courses', amount:0}
+    ],
+    entertainment:[
+      {label:'Subscriptions', amount:45},
+      {label:'Hobbies', amount:100}
+    ],
+    savings:[
+      {label:'Emergency fund', amount:200},
+      {label:'Investments', amount:150}
+    ],
+    other:[
+      {label:'Miscellaneous', amount:75}
+    ],
+  };
+  
+  EXPENSE_CATS.forEach(c=>{
+    exp[c.id] = (defaults[c.id] || []).map(({label, amount})=>({id:uid(),label,amount,freq:'monthly'}));
+  });
+  
+  return {income:inc,expenses:exp};
+}
+
 function addMonth(name){
   if(months[name]) return;
   months[name] = defaultMonth();
@@ -2005,6 +2053,13 @@ function updateCSVSummary(){
 }
 
 function confirmCSVImport(){
+  // Show paywall for CSV import feature
+  closeCSVModal();
+  showPaywallModal('csv-import');
+  return;
+  
+  // Original code (disabled for demo)
+  /*
   const included = csvState.rows.filter(r=>r.include);
   if(!included.length){ alert('Select at least one transaction to import.'); return; }
   const targetKey = csvState.targetMonth || (MONTHS[new Date().getMonth()]+' '+new Date().getFullYear());
@@ -2046,6 +2101,7 @@ function confirmCSVImport(){
     badge.style.display = 'inline';
     setTimeout(()=>{ badge.style.display = 'none'; badge.textContent = original; }, 2200);
   }
+  */
 }
 
 document.getElementById('csvModalOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeCSVModal(); });
@@ -2669,8 +2725,7 @@ function closePaywallModal(id) {
 }
 
 function goToEtsy() {
-  // ⭐ CHANGE THIS TO YOUR ETSY LINK ⭐
-  window.open('https://www.etsy.com/your-shop/budgethome', '_blank');
+  window.open('https://www.etsy.com/listing/4519796385/family-budget-planner-monthly-budget', '_blank');
 }
 
 // Override addMonth to enforce demo limit
@@ -2750,7 +2805,7 @@ if(window.addTabMonth) {
   } else {
     const now = new Date();
     const currentMonth = MONTHS[now.getMonth()] + ' ' + now.getFullYear();
-    months[currentMonth] = defaultMonth();
+    months[currentMonth] = defaultMonthWithExampleData();
     monthOrder = [currentMonth];
     activeMonth = currentMonth;
   }
@@ -2779,11 +2834,11 @@ if(window.addTabMonth) {
   <div class="paywall-modal">
     <div class="paywall-icon">📅</div>
     <div class="paywall-title">Unlimited Months</div>
-    <div class="paywall-text">The demo shows only 1 month. Plan 12+ months ahead with the full version.</div>
+    <div class="paywall-text">The demo shows 6 months. Plan 12+ months ahead with the full version.</div>
     <div class="paywall-features">
-      <div class="paywall-feature"><span class="paywall-check">✓</span> Track 12+ months</div>
+      <div class="paywall-feature"><span class="paywall-check">✓</span> Track unlimited months</div>
       <div class="paywall-feature"><span class="paywall-check">✓</span> Reorder & organize</div>
-      <div class="paywall-feature"><span class="paywall-check">✓</span> Year-round planning</div>
+      <div class="paywall-feature"><span class="paywall-check">✓</span> Year-round + multi-year planning</div>
     </div>
     <div class="paywall-buttons">
       <button class="paywall-btn paywall-btn-secondary" onclick="closePaywallModal('month-limit')">Keep Exploring</button>
@@ -2840,6 +2895,24 @@ if(window.addTabMonth) {
     <div class="paywall-buttons">
       <button class="paywall-btn paywall-btn-secondary" onclick="closePaywallModal('upgrade-main')">Maybe Later</button>
       <button class="paywall-btn paywall-btn-primary" onclick="goToEtsy()">👉 Get on Etsy</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="paywallModal-csv-import">
+  <div class="paywall-modal">
+    <div class="paywall-icon">📤</div>
+    <div class="paywall-title">Bulk Import Transactions</div>
+    <div class="paywall-text">Import bank CSV files directly into BudgetHome. Automatically categorize transactions and save hours of manual entry.</div>
+    <div class="paywall-features">
+      <div class="paywall-feature"><span class="paywall-check">✓</span> Auto-categorize transactions</div>
+      <div class="paywall-feature"><span class="paywall-check">✓</span> Import from any bank</div>
+      <div class="paywall-feature"><span class="paywall-check">✓</span> Bulk edit & organize</div>
+      <div class="paywall-feature"><span class="paywall-check">✓</span> Save hours of data entry</div>
+    </div>
+    <div class="paywall-buttons">
+      <button class="paywall-btn paywall-btn-secondary" onclick="closePaywallModal('csv-import')">Keep Exploring</button>
+      <button class="paywall-btn paywall-btn-primary" onclick="goToEtsy()">Get Full Version</button>
     </div>
   </div>
 </div>
